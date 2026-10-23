@@ -1,0 +1,1 @@
+{"repo":".","base_branch":"main","spec":"docs/SPECS/{nnn}.md","acceptance_dir":"tests/acceptance/{nnn}","acceptance_cmd":["python","ferramentas/piso.py","{report}"],"report_path":".dsh/report-{nnn}.xml","report_format":"junit","runner_configs":[],"regression_cmd":null,"start_cmd":null,"base_url":null,"allowed_paths":["ferramentas/","docs/QA/"]}
