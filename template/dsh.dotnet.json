@@ -1,0 +1,19 @@
+{
+  "repo": ".",
+  "base_branch": "main",
+  "spec": "docs/SPECS/{nnn}.md",
+  "acceptance_dir": "tests/acceptance/{nnn}",
+  "acceptance_cmd": [
+    "dotnet", "test", "tests/acceptance",
+    "--filter", "FullyQualifiedName~Acceptance{nnn}",
+    "--logger", "trx;LogFileName=report-{nnn}.trx",
+    "--results-directory", ".dsh"
+  ],
+  "report_path": ".dsh/report-{nnn}.trx",
+  "report_format": "trx",
+  "runner_configs": ["global.json", "Directory.Build.props", "src/App/App.csproj"],
+  "regression_cmd": ["dotnet", "test", "--nologo"],
+  "start_cmd": ["dotnet", "run", "--project", "src/App", "--urls", "http://127.0.0.1:5080"],
+  "base_url": "http://127.0.0.1:5080/health",
+  "allowed_paths": ["src/", "docs/QA/"]
+}

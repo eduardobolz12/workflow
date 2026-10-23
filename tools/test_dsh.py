@@ -130,6 +130,31 @@ class DshTest(unittest.TestCase):
                          .read_text(encoding="utf-8"))
         self.assertFalse(any("__pycache__" in k for k in man["files"]))
 
+    def test_gate_accepts_trx_report(self):
+        stub = (
+            "import json, sys\n"
+            "import xml.etree.ElementTree as ET\n"
+            'state = json.load(open("src/stub_state.json", encoding="utf-8"))\n'
+            'run = ET.Element("TestRun")\n'
+            'res = ET.SubElement(run, "Results")\n'
+            'for i in range(state["failed"]):\n'
+            '    ET.SubElement(res, "UnitTestResult", testName=f"CA{i+1}", outcome="Failed")\n'
+            'for i in range(state["passed"]):\n'
+            '    ET.SubElement(res, "UnitTestResult", testName=f"CA{i+1}", outcome="Passed")\n'
+            "ET.ElementTree(run).write(sys.argv[1])\n"
+            'sys.exit(1 if state["failed"] else 0)\n'
+        )
+        (self.fx.root / "stub_trx.py").write_text(stub, encoding="utf-8")
+        cfgp = self.fx.root / "dsh.json"
+        cfg = json.loads(cfgp.read_text(encoding="utf-8"))
+        cfg["acceptance_cmd"] = [PY, "stub_trx.py", "{report}"]
+        cfg["report_path"] = ".dsh/report-{nnn}.trx"
+        cfg["report_format"] = "trx"
+        cfgp.write_text(json.dumps(cfg), encoding="utf-8")
+        r = self.fx.dsh("gate", "001", "--yes")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("2 testes, 2 falhas", r.stdout)
+
     def test_gate_rejects_partial_green(self):
         (self.fx.root / "src" / "stub_state.json").write_text('{"failed": 1, "passed": 1}',
                                                              encoding="utf-8")

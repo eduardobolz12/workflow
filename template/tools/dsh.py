@@ -210,7 +210,7 @@ def parse_spec_cas(spec: Path) -> dict[int, str]:
 def parse_test_cas(acc: Path) -> dict[int, str]:
     found: dict[int, str] = {}
     for p in sorted(acc.rglob("*")):
-        if not p.is_file() or p.suffix.lower() not in {".py", ".ts", ".js", ".tsx", ".jsx", ".mjs"}:
+        if not p.is_file() or p.suffix.lower() not in {".py", ".ts", ".js", ".tsx", ".jsx", ".mjs", ".cs"}:
             continue
         for n, line in enumerate(p.read_text(encoding="utf-8-sig", errors="replace").splitlines(), 1):
             for ca in ca_ids_in_text(line):
@@ -248,6 +248,25 @@ def parse_report(cfg: dict, report: Path) -> dict:
         passed = sum(1 for a in results if a.get("status") == "passed")
         return {"tests": len(results), "failed": failed,
                 "skipped": len(results) - failed - passed, "passed": passed}
+    if fmt == "trx":
+        # dotnet test --logger "trx;LogFileName=..." (TRX e o formato nativo do .NET)
+        root = ET.parse(report).getroot()
+        results = list(root.iter("UnitTestResult"))
+        if results:
+            outcomes = [(r.get("outcome") or "").strip().lower() for r in results]
+            failed = sum(1 for o in outcomes if o in {"failed", "error", "timeout", "aborted"})
+            skipped = sum(1 for o in outcomes
+                          if o in {"notexecuted", "skipped", "inconclusive", "disconnected"})
+            return {"tests": len(outcomes), "failed": failed, "skipped": skipped,
+                    "passed": len(outcomes) - failed - skipped}
+        counters = root.find(".//Counters")
+        if counters is None:
+            raise DshError("TRX sem UnitTestResult nem Counters")
+        total = int(counters.get("total", 0))
+        passed = int(counters.get("passed", 0))
+        failed = int(counters.get("failed", 0))
+        return {"tests": total, "failed": failed, "skipped": total - passed - failed,
+                "passed": passed}
     raise DshError(f"report_format desconhecido: {fmt}")
 
 
@@ -359,7 +378,7 @@ def test_block(acc: Path, ca: int) -> str | None:
     """Imprime o bloco de teste inteiro que contem o CA (para a tela do gate)."""
     pat = re.compile(rf"CA[-_ ]?{ca}\b", re.IGNORECASE)
     for p in sorted(acc.rglob("*")):
-        if not p.is_file() or p.suffix.lower() not in {".py", ".ts", ".js", ".tsx", ".jsx", ".mjs"}:
+        if not p.is_file() or p.suffix.lower() not in {".py", ".ts", ".js", ".tsx", ".jsx", ".mjs", ".cs"}:
             continue
         lines = p.read_text(encoding="utf-8-sig", errors="replace").splitlines()
         hit = next((i for i, line in enumerate(lines) if pat.search(line)), None)
@@ -626,6 +645,7 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
