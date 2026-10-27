@@ -11,6 +11,8 @@ Chat é efêmero; arquivo é protocolo.
 | Caminho | O que é |
 |---|---|
 | `prompt-criar-ambiente.md` | prompt para montar o chão de fábrica de um projeto novo |
+| `prompt-organizar-ambiente.md` | mesmo chão de fábrica, com o repo na raiz e o produto em subpasta |
+| `prompt-claude-arquiteto.md` | contrato do arquiteto (Claude): passos 1–4, gate, contestação, QA |
 | `docs/WORKFLOW.md` | manual de operação (6 passos, congelado) |
 | `docs/` (demais) | contrato, briefing do programador, relatórios, tarefas |
 | `tools/dsh.py` | verificador: `gate`, `verify`, `metrics`, `note` (Python stdlib) |
@@ -20,7 +22,8 @@ Chat é efêmero; arquivo é protocolo.
 
 ## Como usar
 
-1. **Ambiente de um projeto novo:** cole o prompt de `prompt-criar-ambiente.md` numa sessão nova.
+1. **Ambiente de um projeto novo:** cole o prompt de `prompt-criar-ambiente.md` numa sessão nova
+   (ou `prompt-organizar-ambiente.md`, quando o repo for a raiz e o produto uma subpasta).
 2. **Provar o encanamento:** copie `template/` para o projeto, rode `gate` na fatia de piso.
 3. **Ciclo normal:** spec com tabela de CAs → teste vermelho → gate → build → verify → aceite.
 
