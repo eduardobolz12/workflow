@@ -13,6 +13,14 @@ URL base: <http://127.0.0.1:8000/health>
 Se o prompt já estiver dentro de `workflow\`, troque o primeiro caminho por
 `workflow\prompt-organizar-ambiente.md`.
 
+**Origem:** [github.com/eduardobolz12/workflow](https://github.com/eduardobolz12/workflow) — as
+ferramentas em `tools/`, o projeto-base em
+[template](https://github.com/eduardobolz12/workflow/tree/main/template). Numa máquina nova:
+
+```powershell
+git clone https://github.com/eduardobolz12/workflow.git C:\dev\workflow
+```
+
 Quem executa é o **DSH**: ele monta o chão de fábrica, não o produto.
 
 ---
@@ -27,6 +35,8 @@ Stack: <python-fastapi | node-next | dotnet>
 Tipo: <novo | existente, com código em ...>
 URL base: <http://127.0.0.1:8000/health>
 Fonte das ferramentas: C:\dev\workflow
+Origem: https://github.com/eduardobolz12/workflow
+Template: https://github.com/eduardobolz12/workflow/tree/main/template
 
 ## Leia antes de agir
 
@@ -66,7 +76,8 @@ o manual operante é o do guia.
 
 ## Sequência
 
-1. Trocar o clone por cópia vendorizada:
+1. Trocar o clone por cópia vendorizada. Se `C:\dev\workflow` não existir:
+   `git clone https://github.com/eduardobolz12/workflow.git C:\dev\workflow`.
 
        Remove-Item <raiz>\workflow -Recurse -Force
        robocopy C:\dev\workflow <raiz>\workflow /E /XD .git
@@ -150,3 +161,14 @@ Não execute nada antes de eu aprovar o plano.
 - **Atualizar as ferramentas** é ato deliberado: copiar de `C:\dev\workflow` de novo, conferir
   `python workflow\tools\dsh.py --help`, rodar o teste de fogo, commitar. O `dsh.py` não entra no
   manifesto, então o commit é o único registro de qual versão aprovou cada fatia.
+
+## Onde este prompt mora
+
+Versionado no repositório do workflow, não no produto:
+`C:\dev\workflow\prompt-organizar-ambiente.md` (commit local `a8eaa57`; sem push, o GitHub ainda
+mostra a versão anterior). Para começar um projeto, copie o arquivo para a raiz e cole — depois do
+passo 1 ele existe dos dois lados: na raiz, se você copiou, e em `<raiz>\workflow\`.
+
+Ele **não afeta o projeto**: o `dsh.py` só hasheia `docs/SPECS/`, `tests/acceptance/NNN/` e a
+config do runner. O prompt não entra no manifesto, não entra no diff e não é lido pelo `gate` nem
+pelo `verify`. É um arquivo inerte no repo — útil como referência, invisível para o processo.
