@@ -1,17 +1,20 @@
 # Prompt — organizar o ambiente
 
-**Como usar:** abra uma sessão nova do DSH com o workspace na raiz do repositório e diga:
+Um prompt por projeto, mas o mesmo texto sempre. Ele não sabe onde vai rodar: a **raiz é a pasta
+atual** (o workspace que você selecionou ao abrir o DSH), e nome do projeto, stack e porta são
+perguntados na abertura.
+
+**Como usar:** abra uma sessão nova do DSH na pasta onde o projeto vai nascer e diga:
 
 ```
 Leia prompt-organizar-ambiente.md e execute.
-Projeto: <projeto>
-Stack: <python-fastapi | node-next | dotnet>
-URL base: <http://127.0.0.1:8000/health>
-É projeto novo.
 ```
 
-Se o prompt já estiver dentro de `workflow\`, troque o primeiro caminho por
-`workflow\prompt-organizar-ambiente.md`.
+Se a pasta não tiver o arquivo, aponte para o repositório do workflow:
+
+```
+Leia C:\dev\workflow\prompt-organizar-ambiente.md e execute.
+```
 
 **Origem:** [github.com/eduardobolz12/workflow](https://github.com/eduardobolz12/workflow) — as
 ferramentas em `tools/`, o projeto-base em
@@ -29,31 +32,33 @@ Quem executa é o **DSH**: ele monta o chão de fábrica, não o produto.
 Você é o DSH (verificador) deste workflow. Nesta sessão você monta o ambiente de desenvolvimento
 de um projeto. Você não implementa produto: cria o chão de fábrica que os outros passos usam.
 
-Raiz do repositório (workspace desta sessão): <raiz>
-Pasta do software: <raiz>\<projeto>
-Stack: <python-fastapi | node-next | dotnet>
-Tipo: <novo | existente, com código em ...>
-URL base: <http://127.0.0.1:8000/health>
-Fonte das ferramentas: C:\dev\workflow
+Raiz: a pasta atual — o workspace desta sessão. Confirme o caminho absoluto e não escreva fora dela.
+Fonte das ferramentas: o repositório workflow nesta máquina (padrão C:\dev\workflow).
 Origem: https://github.com/eduardobolz12/workflow
 Template: https://github.com/eduardobolz12/workflow/tree/main/template
 
-## Leia antes de agir
+## Abertura — antes de qualquer ação
 
-1. <raiz>\workflow\docs\workflow-ambiente.md — checklist de 8 itens e as configs por stack.
-2. <raiz>\workflow\docs\guia_completo_workflow.md — os 8 passos; é o manual que vale.
-3. <raiz>\workflow\prompt-criar-ambiente.md — o encanamento mínimo e o motivo de cada item.
-
-Não procure docs/CONTRATO.md (não existe). docs/WORKFLOW.md está desatualizado (6 passos):
-o manual operante é o do guia.
+1. Diga em 2 linhas o que vai fazer e em que pasta (caminho absoluto). Nada além disso.
+2. Inventarie a raiz: está vazia? é repositório git com commits? já existe uma pasta `workflow\`?
+   Se houver qualquer coisa, mostre o inventário e pergunte antes de tocar em arquivo.
+3. Pergunte, uma de cada vez, esperando a resposta:
+   - "Qual é o nome do projeto?" — é o nome da pasta do software: `<projeto>\`.
+   - "Projeto novo ou existente?" — se existente, onde está o código hoje.
+   - "Qual stack?" — python-fastapi, node-next ou dotnet. Se eu não souber, explique em 1 linha
+     o custo de cada um: comando de teste com relatório e porta padrão.
+   - "Qual porta e URL base?" — sugira o padrão do stack escolhido.
+4. Só então monte o plano numerado. Não execute nada antes de eu aprovar.
 
 ## Layout — não negocie
 
-    <raiz>\                     .git, dsh.json, .gitignore, .gitattributes
-    <raiz>\workflow\            ferramentas + manual (cópia sem .git)
-    <raiz>\docs\                SPECS\, QA\, MAPA.md, metricas.csv, manifesto\   ← a régua
-    <raiz>\tests\acceptance\    os testes, uma pasta por fatia (NNN)
-    <raiz>\<projeto>\           só software: código e config do stack
+Tudo relativo à raiz:
+
+    .\workflow\              ferramentas + manual (cópia do repositório, sem .git)
+    .\docs\                  SPECS\, QA\, MAPA.md, metricas.csv, manifesto\   ← a régua
+    .\tests\acceptance\      os testes, uma pasta por fatia (NNN)
+    .\<projeto>\             só software: código e config do stack
+    .\dsh.json  .gitignore  .gitattributes
 
 - um único .git, na raiz. `workflow\` e `<projeto>\` não têm repositório;
 - a régua (docs\ e tests\) fica FORA do produto, de propósito: é o que impede o programador de
@@ -66,7 +71,7 @@ o manual operante é o do guia.
 
 - não escreve código de produção (só a casca 404 e configuração);
 - não instala pacote (o shell não tem HTTPS): lista o comando exato e espera eu rodar;
-- não escreve fora de <raiz>;
+- não escreve fora da raiz;
 - um passo por vez: ação, comando, saída esperada, critério de pronto;
 - para para minha decisão em: porta, banco, estrutura de pastas, versões;
 - não inventa comando, caminho, versão ou porta;
@@ -78,14 +83,13 @@ o manual operante é o do guia.
 
 1. Trocar o clone por cópia vendorizada. Se `C:\dev\workflow` não existir:
    `git clone https://github.com/eduardobolz12/workflow.git C:\dev\workflow`.
+   Se `.\workflow` já existir e não for a cópia do repositório, pare e pergunte.
 
-       Remove-Item <raiz>\workflow -Recurse -Force
-       robocopy C:\dev\workflow <raiz>\workflow /E /XD .git
+       Remove-Item .\workflow -Recurse -Force
+       robocopy C:\dev\workflow .\workflow /E /XD .git
 
-   Conferir: `<raiz>\workflow\tools\dsh.py` existe e `<raiz>\workflow\.git` NÃO existe.
+   Conferir: `.\workflow\tools\dsh.py` existe e `.\workflow\.git` NÃO existe.
    Código de saída 1–3 do robocopy é sucesso.
-   Apagar da raiz as cópias soltas `prompt_claude_arquiteto.md` e `prompt-organizar-ambiente.md`:
-   a versão canônica passa a ser a de dentro de `workflow\`.
 
 2. Esqueleto do template para a raiz, criando as pastas: `dsh.json` (piso), `.gitignore`,
    `.gitattributes`, `ferramentas\`, `docs\SPECS\900.md`, `tests\acceptance\900\`.
@@ -95,29 +99,30 @@ o manual operante é o do guia.
 3. `New-Item .dsh -ItemType Directory` — o `piso.py` não cria a pasta, e sem ela o
    `setup-check -RunTests` reprova com "suite nao gerou relatorio".
 
-4. Ajustar `<raiz>\workflow\tools\setup-check.ps1`: trocar as duas ocorrências de `tools\dsh.py`
+4. Ajustar `.\workflow\tools\setup-check.ps1`: trocar as duas ocorrências de `tools\dsh.py`
    por `workflow\tools\dsh.py`. Registrar em `docs\QA\000-ambiente.md` como divergência local.
 
-5. `git init -b main`; `git add -A`; commit `"ambiente: encanamento"`.
+5. Se a raiz ainda não for repositório: `git init -b main`. Depois `git add -A` e commit
+   `"ambiente: encanamento"`.
 
 6. Teste de fogo:
 
        python workflow\tools\dsh.py gate 900 --yes
-       powershell -File workflow\tools\setup-check.ps1 -Repo . -Workspace <raiz> -RunTests
+       powershell -File workflow\tools\setup-check.ps1 -Repo . -Workspace . -RunTests
 
    Esperado: `1 testes, 1 falhas` + manifesto gravado; `=== ambiente pronto ===`.
 
 7. Trocar para o stack: `Copy-Item workflow\template\dsh.<stack>.json dsh.json`; apagar
    `ferramentas\`, `docs\SPECS\900.md`, `tests\acceptance\900\`, `docs\manifesto\900.*`.
 
-8. Criar `<projeto>\` e ajustar `dsh.json`: `allowed_paths`, `start_cmd`, `base_url`,
+8. Criar `.\<projeto>\` e ajustar `dsh.json`: `allowed_paths`, `start_cmd`, `base_url`,
    `regression_cmd`, `runner_configs`. `start_cmd` roda da raiz — use `--project <projeto>` ou
    módulo `<projeto>.app.main:app`, nunca `cd` encadeado. `tests/acceptance/{nnn}` fica como
    está: os testes moram na raiz mesmo.
 
-9. Runner real: rodar uma vez o comando de teste com relatório e provar o arquivo em `.dsh\`.
+9. Runner real: rodar uma vez o comando de teste com relatório e provar o arquivo em `.\dsh\`.
 
-10. Casca do app em `<projeto>\`: sobe pelo comando oficial, responde 200 em `base_url` e 404
+10. Casca do app em `.\<projeto>\`: sobe pelo comando oficial, responde 200 em `base_url` e 404
     no resto.
 
 11. `docs\QA\000-ambiente.md` (pronto / pendente / por quê) e commit `"ambiente: stack"`.
@@ -140,6 +145,8 @@ Não execute nada antes de eu aprovar o plano.
 
 | Item | Falha que evita |
 |---|---|
+| Raiz = pasta atual, inventariada antes | prompt que apaga/sobrescreve arquivo de uma pasta que não era dele |
+| Nome, stack e porta perguntados na abertura | prompt decorado com o projeto errado, ou com o stack de outro produto |
 | `workflow\` sem `.git` | clone aninhado vira gitlink; `git add` ignora o conteúdo e o status mente |
 | Um `.git` só na raiz | histórico separado: a fatia não registra qual versão do verificador a aprovou |
 | `/E /XD .git` no robocopy | copiar o `.git` do upstream cria o repositório embutido de novo |
@@ -153,21 +160,20 @@ Não execute nada antes de eu aprovar o plano.
 
 ## O que este prompt assume
 
-- **Um repositório por projeto.** As fatias numeram 001… no repo inteiro. Se um dia houver dois
+- **Uma pasta = um projeto.** As fatias numeram 001… no repo inteiro. Se um dia houver dois
   produtos no mesmo repo, prefixe a spec por produto (`docs\SPECS\<projeto>\NNN.md`) e ajuste a
   chave `spec` — fora isso, não muda nada.
-- **De um produto para outro, mudam três coisas:** o campo `Projeto`, o `stack` e a `URL base`.
-  O resto do prompt é idêntico.
+- **O prompt não tem projeto embutido.** Nome, stack e porta entram na conversa, não no arquivo.
+  Você pode rodar o mesmo texto em qualquer pasta, em qualquer projeto, sem editar nada.
 - **Atualizar as ferramentas** é ato deliberado: copiar de `C:\dev\workflow` de novo, conferir
   `python workflow\tools\dsh.py --help`, rodar o teste de fogo, commitar. O `dsh.py` não entra no
   manifesto, então o commit é o único registro de qual versão aprovou cada fatia.
 
 ## Onde este prompt mora
 
-Versionado no repositório do workflow, não no produto:
-`C:\dev\workflow\prompt-organizar-ambiente.md` (commit local `a8eaa57`; sem push, o GitHub ainda
-mostra a versão anterior). Para começar um projeto, copie o arquivo para a raiz e cole — depois do
-passo 1 ele existe dos dois lados: na raiz, se você copiou, e em `<raiz>\workflow\`.
+Versionado no repositório do workflow, não no produto: `C:\dev\workflow\prompt-organizar-ambiente.md`.
+Para começar um projeto, copie o arquivo para a raiz e execute — depois do passo 1 ele existe dos
+dois lados, na raiz (se você copiou) e em `.\workflow\`.
 
 Ele **não afeta o projeto**: o `dsh.py` só hasheia `docs/SPECS/`, `tests/acceptance/NNN/` e a
 config do runner. O prompt não entra no manifesto, não entra no diff e não é lido pelo `gate` nem
