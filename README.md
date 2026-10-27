@@ -11,7 +11,7 @@ Chat é efêmero; arquivo é protocolo.
 | Caminho | O que é |
 |---|---|
 | `prompt-criar-ambiente.md` | prompt para montar o chão de fábrica de um projeto novo |
-| `prompt-organizar-ambiente.md` | mesmo chão de fábrica, com o repo na raiz e o produto em subpasta |
+| `prompt-organizar-ambiente.md` | mesmo chão de fábrica, com as ferramentas em `workflow/` e o produto em subpasta |
 | `prompt-claude-arquiteto.md` | contrato do arquiteto (Claude): passos 1–4, gate, contestação, QA |
 | `docs/WORKFLOW.md` | manual de operação (6 passos, congelado) |
 | `docs/` (demais) | contrato, briefing do programador, relatórios, tarefas |
